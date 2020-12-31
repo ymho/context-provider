@@ -11,6 +11,4 @@ Supported NGSI-v2 context provider endpoints.
 
 [comment]: <> (* `/gov/covid-19/<city>/<data>/op/query`)
 
-* /
-
 The following dynamic NGSI v2 endpoints are supported
