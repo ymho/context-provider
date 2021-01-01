@@ -1,6 +1,6 @@
 const debug = require('debug')('mdg-context-provider:server');
-const Formatter = require('../../lib/formatter');
 const request = require('request-promise');
+const _ = require('lodash');
 require('dotenv').config();
 
 // 政府 OpenData API
@@ -17,6 +17,7 @@ const OPEN_DATA_API_URL = process.env.OPEN_DATA_API_URL;
 //         testCasesList: 'kobe-shi/test-cases'
 //     }
 // };
+
 
 // healthチェック用ダミーデータ
 const dummyValues = {
@@ -43,18 +44,16 @@ function healthCheck(req, res) {
 
 // 都市名と要求データから，NGSIv2モデルでデータを返却（cPr→orion)
 function getAsNGSIv2(req, res) {
-    // makeOpenDataAPIRequest(req.params.city, req.params.data)
-    makeOpenDataAPIRequest("kobe-shi", "patients")
+    makeOpenDataAPIRequest(req.params.city, req.params.data)
         .then((result) => {
             const body = JSON.parse(result);
             if (body == null) {
                 throw new Error({ message: 'Not Found', statusCode: 404 });
             }
             res.set('Content-Type', 'application/json');
-
             // bodyをNGSIv2形式に変換する処理が必要
             // その際，パラメータを特定する必要がある
-            res.send(body)
+            res.send(formatAsV2Response(req,body));
         })
         .catch((err) => {
                 debug(err);
@@ -63,11 +62,6 @@ function getAsNGSIv2(req, res) {
         });
 }
 
-module.exports = {
-    healthCheck,
-    getAsNGSIv2
-};
-
 // CPr→OpenDataAPIへデータをリクエストし返却
 function makeOpenDataAPIRequest(city, data){
     return request({
@@ -75,3 +69,47 @@ function makeOpenDataAPIRequest(city, data){
         method: 'GET',
     });
 }
+
+// 空白を除いた文字列の先頭を大文字にして返却
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1);
+    });
+}
+
+// DataFormatter
+// req: idやname，paramsが含まれるリクエスト
+// inputData: 外部APIから取得したデータオブジェクト
+function formatAsV2Response(req, inputData){
+    // console.log(inputData)
+    // const schema = req.params.schema;
+    const queryResponse = [];
+    // 各エンティティに対して
+    _.forEach(req.body.entities, (entity) => {
+        const element = {
+            id: entity.id,
+            type: entity.type
+        };
+        // 各アトリビュートに対して
+        _.forEach(req.body.attributes, (attribute) => {
+            // attribute要素を追加
+            index = (element.id).substring((element.id).lastIndexOf(".")+1);
+            if(attribute in inputData[index]){
+                element[attribute] = {
+                    type: toTitleCase(req.params.type),
+                    // id番目のschemaの値をvalueとする
+                    value: inputData[index][attribute]
+                }
+            }else {
+                console.log("リクエストに存在しないアトリビュート<"+attribute+">が含まれているか参照範囲を超えています");
+            }
+        });
+        queryResponse.push(element);
+    });
+    return queryResponse;
+}
+
+module.exports = {
+    healthCheck,
+    getAsNGSIv2,
+};
