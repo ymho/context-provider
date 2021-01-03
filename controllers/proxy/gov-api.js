@@ -91,7 +91,7 @@ function formatAsV2Response(req, inputData){
             type: entity.type
         };
         // 各アトリビュートに対して
-        _.forEach(req.body.attributes, (attribute) => {
+        _.forEach(req.body.attrs, (attribute) => {
             // attribute要素を追加
             index = (element.id).substring((element.id).lastIndexOf(".")+1);
             if(attribute in inputData[index]){
