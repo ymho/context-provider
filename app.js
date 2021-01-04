@@ -10,6 +10,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const debug = require('debug')('mdg-context-provider:server');
 const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(20).toString('hex');
+const getData = require('./tools/import_data');
 
 const app = express();
 const mongoose = require('mongoose');
@@ -33,6 +34,8 @@ const connectWithRetry = () => {
       });
 };
 connectWithRetry();
+
+console.log(getData());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -80,7 +83,7 @@ app.use(function (req, res, next) {
 });
 
 const proxyV2Router = require('./routes/proxy-v2');
-const DataPersist = require('./controllers/ngsi-v2/building-update');
+// const DataPersist = require('./controllers/ngsi-v2/building-update');
 app.use('/', proxyV2Router);
 
 app.use('/health', healthRouter);
