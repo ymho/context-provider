@@ -10,7 +10,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const debug = require('debug')('mdg-context-provider:server');
 const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(20).toString('hex');
-const getData = require('./tools/import_data');
+const importData = require('./tools/import_data');
 
 const app = express();
 const mongoose = require('mongoose');
@@ -35,7 +35,9 @@ const connectWithRetry = () => {
 };
 connectWithRetry();
 
-console.log(getData());
+importData().catch((err) => {
+    console.log("データの登録に失敗しました。エラーコード"+err.statusCode)
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

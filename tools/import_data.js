@@ -1,9 +1,11 @@
 // コンテキストプロバイダを登録する
+const request = require('request-promise');
+const ORION_URL = process.env.ORION_URL;
 
 function getEntities(){
     let entities = [];
     for(let i=1; i<10000; i++){
-        entity = {
+        let entity = {
             "id": "jp.opendata-api.kobe.covid-19.Patients."+zeroPadding(i,5),
             "type": "Patients"
         };
@@ -31,4 +33,12 @@ function zeroPadding(num, len){
     return (Array(len).join('0')+num).slice(-len);
 }
 
-module.exports = getData;
+function registration(){
+    return request({
+        url: ORION_URL + '/v2/registrations',
+        method: 'POST',
+        json: getData(),
+    });
+}
+
+module.exports = registration;
