@@ -95,11 +95,11 @@ function formatAsV2Response(req, inputData){
         _.forEach(req.body.attrs, (attribute) => {
             // attribute要素を追加
             index = (element.id).substring((element.id).lastIndexOf(".")+1);
-            if(attribute in inputData[index] && Translation.translate(attribute)){
-                element[Translation.translate(attribute)] = {
+            if(Translation.translate(attribute) in inputData[index]){
+                element[attribute] = {
                     type: toTitleCase(req.params.type),
                     // id番目のschemaの値をvalueとする
-                    value: inputData[index][attribute]
+                    value: inputData[index][Translation.translate(attribute)]
                 }
             }else {
                 console.log("リクエストに存在しないアトリビュート<"+attribute+">が含まれているか参照範囲を超えています");
