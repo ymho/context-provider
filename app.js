@@ -103,8 +103,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-importData().catch((err) => {
-    console.log("データの登録に失敗しました。エラーコード"+err.statusCode)
-});
+// importData().catch((err) => {
+//     console.log("データの登録に失敗しました。エラーコード"+err.statusCode)
+// });
 
 module.exports = app;
