@@ -1,5 +1,6 @@
 const debug = require('debug')('mdg-context-provider:server');
 const request = require('request-promise');
+const Translation = require('../../lib/translation');
 const _ = require('lodash');
 require('dotenv').config();
 
@@ -94,8 +95,8 @@ function formatAsV2Response(req, inputData){
         _.forEach(req.body.attrs, (attribute) => {
             // attribute要素を追加
             index = (element.id).substring((element.id).lastIndexOf(".")+1);
-            if(attribute in inputData[index]){
-                element[attribute] = {
+            if(attribute in inputData[index] && Translation.translate(attribute)){
+                element[Translation.translate(attribute)] = {
                     type: toTitleCase(req.params.type),
                     // id番目のschemaの値をvalueとする
                     value: inputData[index][attribute]
