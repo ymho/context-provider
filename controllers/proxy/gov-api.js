@@ -94,7 +94,7 @@ function formatAsV2Response(req, inputData){
         // 各アトリビュートに対して
         _.forEach(req.body.attrs, (attribute) => {
             // attribute要素を追加
-            index = (element.id).substring((element.id).lastIndexOf(".")+1);
+            index = Number((element.id).substring((element.id).lastIndexOf(".")+1));
             if(Translation.translate(attribute) in inputData[index]){
                 element[attribute] = {
                     type: toTitleCase(req.params.type),
