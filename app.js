@@ -35,10 +35,6 @@ const connectWithRetry = () => {
 };
 connectWithRetry();
 
-importData().catch((err) => {
-    console.log("データの登録に失敗しました。エラーコード"+err.statusCode)
-});
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -105,6 +101,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+importData().catch((err) => {
+    console.log("データの登録に失敗しました。エラーコード"+err.statusCode)
 });
 
 module.exports = app;
